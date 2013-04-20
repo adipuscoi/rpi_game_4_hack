@@ -31,6 +31,8 @@
 	
 	var posX, posY;
 	
+	var dx = 0, dy = 0;
+	
 	var addMessageToChatWindow = function( msg )
 	{
 		var newChatMessage = document.createElement( "div" );
@@ -258,22 +260,60 @@ var generateTerrain= function(dimX, dimY)
 	
 	var bias = 3;
 	
-	groundLimitY = Math.floor(5*dimY/7);
+	groundLimitY = Math.floor(3*dimY/7);
 	console.log(groundLimitY);
 	
-	startBlock = Math.floor(Math.random()*groundLimitY);
+	startBlockOld = groundLimitY + Math.floor(Math.random()*(dimY-groundLimitY-2));
+	console.log(startBlockOld);
 	
 	
-	for(x = 0; x < dimX; x++)
-	{
-		while (startBlock> groundLimitY)
+	
+	
+	//{
+		startBlock = startBlockOld + Math.floor( Math.random()*bias*2)-bias;
+		//}
+		
+		
+		
+		startBlockOld = startBlock;
+		
+		posY = startBlockOld;
+		console.log(posY);
+		
+		if(startBlock > dimY-1)
+			startBlock = dimY-1;
+		if(startBlock < 0)
+			startBlock = 0;
+		
+		for(y = startBlock; y<dimY ; y++)
 		{
-			startBlock += Math.floor( Math.random()*bias*2)-bias;
+			terrain[y][0] =  map.ROCK;
 		}
+		terrain[startBlock][0] =  map.BEDROCK;
+	
+	
+	for(x = 1; x < dimX; x++)
+	{
+		//while (startBlock > groundLimitY)
+		startBlock = startBlockOld + Math.floor( Math.random()*bias*2)-bias;
+		//}
+		
+		
+		
+		startBlockOld = startBlock;
+		console.log(posY);
+		
+		if(startBlock > dimY-1)
+			startBlock = dimY-1;
+		if(startBlock < 0)
+			startBlock = 0;
+		
 		for(y = startBlock; y<dimY ; y++)
 		{
 			terrain[y][x] =  map.ROCK;
-		}	
+		}
+		terrain[startBlock][x] =  map.BEDROCK;
+		
 	}
 }
 	
@@ -293,7 +333,8 @@ var generateTerrain= function(dimX, dimY)
 		*/
 		var groundTiles = [];
 		groundTilesToLoad = 4;
-		for( var i = 1; i < 5; i++ )
+		generateTerrain( 40, 40 );
+		for( var i = 0; i < 5; i++ )
 		{
 			groundTiles[i] = new Image();
 			groundTiles[i].src = 'resources/img/' + i + '.png';
@@ -310,16 +351,119 @@ var generateTerrain= function(dimX, dimY)
 	
 		function drawMap()
 		{
-			generateTerrain( 300, 200 );
+			ctx.clearRect(0,0,1000,1000);
 			for( var y = 0; y < terrain.length; y++ )
 			{
 				for( var x = 0; x < terrain[y].length; x++ )
 				{
-					if( terrain[y][x] != 0 )
-					{
-						ctx.drawImage(groundTiles[terrain[y][x]],x*30,y*30);
-					}
+					//if( terrain[y][x] != 0 )
+					//{
+						ctx.drawImage(groundTiles[terrain[y][x]], dx+x*30, dy+y*30);
+						
+					//}
 				}
 			}
+			ctx.drawImage(groundTiles[4],dx, dy+(posY-1)*30);
+			ctx.drawImage(groundTiles[4],dx, dy+(posY-2)*30);
+			
 		}
+		
+		//Events for canvas		
+		gameCanvas = document.getElementById("gameCanvas");
+		mouseCoord = document.getElementById("mouseCoord");
+		
+		var timer;
+		var timerSet = false;
+		setTimerForMovement = function(e)
+		{
+			if( timerSet )
+			{
+				return;
+			}
+			console.log("set");
+			if( timer != null )
+			{
+				clearInterval(timer);
+			}
+			var opt = 0;
+			switch(e.keyCode)
+			{
+				
+				case 87://w
+					opt = 1;
+					break;
+				case 65://a
+					opt = 2;
+					break;
+				case 68://d
+					opt = 3;
+					break;
+				case 83://s
+					opt = 4;
+					break;		
+			}
+			moveCanvas( opt );
+			timer = setInterval(function()
+			{
+				moveCanvas( opt );
+			}, 10);
+			timerSet = true;
+		}
+		
+		clearTimerForMovement = function(e)
+		{
+			console.log("clear");
+			clearInterval(timer);
+			timer = null;
+			timerSet = false;
+		}
+		
+		
+		var moveCanvas = function(opt)
+		{
+			switch(opt)
+			{
+				
+				case 1://w
+					dy++;
+					drawMap();
+					break;
+				case 2://a
+					dx++;
+					drawMap();
+					break;
+				case 3://d
+					dx--;
+					drawMap();
+					break;
+				case 4://s
+					dy--;
+					drawMap();
+					break;		
+			}
+		}
+		
+		
+		kat.addEvent({ 
+						elm: gameCanvas,
+						event: "keyup",
+						fct: clearTimerForMovement
+					});
+					
+		kat.addEvent({ 
+						elm: gameCanvas,
+						event: "keydown",
+						fct: setTimerForMovement
+					});		
+					
+		kat.addEvent({
+						elm: gameCanvas,
+						event: "mousemove",
+						fct:function(e){
+										coords = kat.getMouseInElementXY(e);
+										mouseCoord.innerHTML= coords.x +" "+coords.y;
+												}
+		
+		
+		});
 	}
