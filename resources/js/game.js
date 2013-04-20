@@ -31,6 +31,8 @@
 	
 	var posX, posY;
 	
+	var posXAstru = 0, posYAstru = 0;
+	
 	var dx = 0, dy = 0;
 	
 	var addMessageToChatWindow = function( msg )
@@ -262,17 +264,17 @@ var generateTerrain= function(dimX, dimY)
 	var bias = 3;
 	
 	groundLimitY = Math.floor(3*dimY/7);
-	console.log(groundLimitY);
+	//console.log(groundLimitY);
 	
 	startBlockOld = groundLimitY + Math.floor(Math.random()*(dimY-groundLimitY-2));
-	console.log(startBlockOld);
+	//console.log(startBlockOld);
 	
 		startBlock = startBlockOld + Math.floor( Math.random()*bias*2)-bias;
 			
 		startBlockOld = startBlock;
 		
 		posY = startBlockOld;
-		console.log(posY);
+		//console.log(posY);
 		
 		if(startBlock > dimY-1)
 			startBlock = dimY-1;
@@ -291,7 +293,7 @@ var generateTerrain= function(dimX, dimY)
 		startBlock = startBlockOld + Math.floor( Math.random()*bias*2)-bias;
 			
 		startBlockOld = startBlock;
-		console.log(posY);
+		//console.log(posY);
 		
 		if(startBlock > dimY-1)
 			startBlock = dimY-1;
@@ -360,6 +362,8 @@ var generateTerrain= function(dimX, dimY)
 		//Events for canvas		
 		gameCanvas = document.getElementById("gameCanvas");
 		mouseCoord = document.getElementById("mouseCoord");
+		mapContainer = document.getElementById("mapContainer");
+		
 		var canvasHeight = gameCanvas.getAttribute("height");
 		var canvasWidth = gameCanvas.getAttribute("width");
 		
@@ -434,7 +438,6 @@ var generateTerrain= function(dimX, dimY)
 				case 4://s
 					if(map.DIM_Y*map.CUBE_SIZE - canvasHeight > -1*dy )
 						dy--;
-					console.log(map.DIM_Y*map.CUBE_SIZE - (dy-1));
 					drawMap();
 					break;		
 			}
@@ -463,4 +466,36 @@ var generateTerrain= function(dimX, dimY)
 		
 		
 		});
+		
+	//Change background color
+		
+	var blue = 0;
+	var red = 0;
+	var pas = 1;
+		
+	var changeBackgroundColor = function()
+	{
+		switch(blue)
+		{
+			case 255:
+				pas = -1;
+				break;
+			case 20:
+				pas = +1;
+				break;
+			default:
+				//console.log("Change background color");
+				break;
+		}	
+
+		posXAstru += 255/canvasWidth;
+				
+		blue = blue+pas;
+				//console.log(blue);
+		
+		mapContainer.style.backgroundColor ="rgb(" + red + " , "+red+" , "+blue+" )";
+	}
+
+	setInterval(changeBackgroundColor,10);
+		
 	}
