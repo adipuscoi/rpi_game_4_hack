@@ -230,8 +230,9 @@
 	"DIRT":3,
     "SAND":4,
     "NR_BLOCKS":5,
-	"DIM_X":100,
-	"DIM_Y":100,
+	"DIM_X":40,
+	"DIM_Y":40,
+	"CUBE_SIZE":30,
 }
 
 
@@ -266,15 +267,8 @@ var generateTerrain= function(dimX, dimY)
 	startBlockOld = groundLimitY + Math.floor(Math.random()*(dimY-groundLimitY-2));
 	console.log(startBlockOld);
 	
-	
-	
-	
-	//{
 		startBlock = startBlockOld + Math.floor( Math.random()*bias*2)-bias;
-		//}
-		
-		
-		
+			
 		startBlockOld = startBlock;
 		
 		posY = startBlockOld;
@@ -294,12 +288,8 @@ var generateTerrain= function(dimX, dimY)
 	
 	for(x = 1; x < dimX; x++)
 	{
-		//while (startBlock > groundLimitY)
 		startBlock = startBlockOld + Math.floor( Math.random()*bias*2)-bias;
-		//}
-		
-		
-		
+			
 		startBlockOld = startBlock;
 		console.log(posY);
 		
@@ -333,7 +323,7 @@ var generateTerrain= function(dimX, dimY)
 		*/
 		var groundTiles = [];
 		groundTilesToLoad = 4;
-		generateTerrain( 40, 40 );
+		generateTerrain( map.DIM_X, map.DIM_Y );
 		for( var i = 0; i < 5; i++ )
 		{
 			groundTiles[i] = new Image();
@@ -358,19 +348,20 @@ var generateTerrain= function(dimX, dimY)
 				{
 					//if( terrain[y][x] != 0 )
 					//{
-						ctx.drawImage(groundTiles[terrain[y][x]], dx+x*30, dy+y*30);
+						ctx.drawImage(groundTiles[terrain[y][x]], dx+x*map.CUBE_SIZE, dy+y*map.CUBE_SIZE);						
 						
 					//}
 				}
 			}
-			ctx.drawImage(groundTiles[4],dx, dy+(posY-1)*30);
-			ctx.drawImage(groundTiles[4],dx, dy+(posY-2)*30);
-			
+			ctx.drawImage(groundTiles[4],dx, dy+(posY-1)*map.CUBE_SIZE);
+			ctx.drawImage(groundTiles[4],dx, dy+(posY-2)*map.CUBE_SIZE);			
 		}
 		
 		//Events for canvas		
 		gameCanvas = document.getElementById("gameCanvas");
 		mouseCoord = document.getElementById("mouseCoord");
+		var canvasHeight = gameCanvas.getAttribute("height");
+		var canvasWidth = gameCanvas.getAttribute("width");
 		
 		var timer;
 		var timerSet = false;
@@ -425,19 +416,25 @@ var generateTerrain= function(dimX, dimY)
 			{
 				
 				case 1://w
-					dy++;
+					if(dy< 0)
+						dy++;	
+					
 					drawMap();
 					break;
 				case 2://a
+					if(dx<0)
 					dx++;
 					drawMap();
 					break;
 				case 3://d
+					if(map.DIM_X*map.CUBE_SIZE - canvasWidth > -1*dx)
 					dx--;
 					drawMap();
 					break;
 				case 4://s
-					dy--;
+					if(map.DIM_Y*map.CUBE_SIZE - canvasHeight > -1*dy )
+						dy--;
+					console.log(map.DIM_Y*map.CUBE_SIZE - (dy-1));
 					drawMap();
 					break;		
 			}
