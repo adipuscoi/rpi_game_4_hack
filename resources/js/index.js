@@ -11,9 +11,10 @@
 						
 						var sendData = function()
 						{
+							var username = usernameInput.value.replace(/^\s+|\s+$/g, '');
 							if(
-								trim( usernameInput.value ) == ""
-								|| !kat.usernameRegex.test( usernameInput.value )
+								username == ""
+								|| !kat.usernameRegex.test( username )
 							)
 							{
 								alert( "Bad username" );
@@ -21,7 +22,8 @@
 								return;
 							}
 							
-							if( trim( passwordInput.value ) == "" )
+							var password = passwordInput.value
+							if( password.length < 4 )
 							{
 								alert( "Bad password" );
 								
@@ -37,7 +39,7 @@
 												},
 											callback: function( xmlhttp )
 											{
-												var res = commonJSONResponseProcessing( xmlhttp );
+												var res = kat.commonJSONResponseProcessing( xmlhttp );
 												
 												if( !res )
 												{

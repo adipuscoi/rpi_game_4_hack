@@ -3,12 +3,13 @@
 	error_reporting(E_ALL|E_STRICT);
 	
 	header("Content-Type: text/html; charset=utf-8\n");
-	/*
+	
 	session_start();
-	if( !isset( $_SESSION["user_id"] ) )
+	
+	if( !isset( $_SESSION["username"] ) )
 	{
 		header( "Location: index.php" );
-	}*/
+	}
 ?>
 
 <!DOCTYPE html>

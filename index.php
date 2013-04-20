@@ -8,7 +8,7 @@
 	
 	//session_destroy(); exit();
 	
-	if( isset( $_SESSION["user_id"] ) )
+	if( isset( $_SESSION["username"] ) )
 	{
 		header( "Location: game.php" ) ;
 	}
