@@ -239,17 +239,6 @@
 							elm: gameCanvas,
 							event: "keydown",
 							fct: setTimerForMovement
-						});		
-						
-			kat.addEvent({
-							elm: gameCanvas,
-							event: "mousemove",
-							fct:function(e){
-											coords = kat.getMouseInElementXY(e);
-											mouseCoord.innerHTML= coords.x +" "+coords.y;
-													}
-			
-			
 						});
 	}
 
@@ -433,7 +422,6 @@ var generateTerrain= function(dimX, dimY)
 			ctx.drawImage(character[crtCharacter],dx, dy+offset*map.CUBE_SIZE+(posY-2)*map.CUBE_SIZE);							
 		}		
 		
-		mouseCoord = document.getElementById("mouseCoord");
 		mapContainer = document.getElementById("mapContainer");
 		
 		

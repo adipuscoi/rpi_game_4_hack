@@ -34,12 +34,9 @@
 	
 	.mapContainer
 	{
-		width: 800px;
-		height: 600px;
 		overflow: hidden;
 		border: 1px solid red;
-		background-image: url("http://1-background.com/images/stars-1/beautiful-blue-stars-fill.jpg");
-		background-color: #222222;
+		background-color: #000000;
 	}
 	
 	.userContainer
