@@ -33,12 +33,6 @@
 							event: "load",
 							fct: function()
 							{
-							/*
-								initGame({
-											userId: <?php echo json_encode( $_SESSION["user_id"] ); ?>,
-											username: <?php echo json_encode( $_SESSION["user_username"] ); ?>
-										});
-							*/
 								initGame();
 								
 								initWS({
@@ -55,17 +49,9 @@
 		<div id="main">
 			<div id="gameScreenContainer">
 				<div id="mapContainer" class="mapContainer">
-					<canvas id="gameCanvas" width="1000" height="940" tabindex="1"></canvas>
+					<canvas id="gameCanvas" width="1200" height="800" tabindex="1"></canvas>
 				</div>
 				
-			</div>
-			
-			<div id="chatMainContainer">
-				<div id="chatMessagesContainer">
-				</div>
-				
-				<textarea rows="2" cols="25" id="chatInput"/></textarea>
-				<input type="button" id="chatSendButton" value="Send"/>
 			</div>
 			
 		</div>

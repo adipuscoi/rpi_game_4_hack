@@ -1,24 +1,8 @@
 
-	#chatMainContainer
-	{
-		display: inline-block;
-		vertical-align: top;
-		width: 300px;
-		height: 600px;
-		border: 1px solid black;
-	}
-	
-	#chatMessagesContainer
-	{
-		background-color: white;
-		overflow: scorll;
-		height: 550px;
-	}
 	
 	#gameScreenContainer
 	{
 		display: inline-block;
-		width: 802px;
 		vertical-align: top;
 	}
 	

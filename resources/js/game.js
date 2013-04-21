@@ -1,31 +1,3 @@
-
-	var colors = ["red", "green", "blue", "orange", "cyan", "magenta", "yellow", "lime", "maroon", "olive", "pink", "teal"];
-
-	window.WebSocket = window.WebSocket || window.MozWebSocket;
-
-	var connection = new WebSocket('ws://10.10.0.42:31415');
-
-	connection.onopen = function () {
-		// connection is opened and ready to use
-	};
-
-	connection.onerror = function (error) {
-		// an error occurred when sending/receiving data
-	};
-
-	connection.onmessage = function (message) {
-		// try to decode json (I assume that each message from server is json)
-		
-		console.log( message );
-		try {
-			var json = JSON.parse(message.data);
-		} catch (e) {
-			console.log('This doesn\'t look like a valid JSON: ', message.data);
-			return;
-		}
-	};
-	
-	var chatMessagesContainer = null;
 	
 	var ctx = null;
 	
@@ -34,195 +6,6 @@
 	var posXAstru = 0, posYAstru = 0;
 	
 	var dx = 0, dy = 0;
-	
-	var addMessageToChatWindow = function( msg )
-	{
-		var newChatMessage = document.createElement( "div" );
-		newChatMessage.className = "chatMessage";
-		
-		newChatMessage.appendChild( document.createTextNode( msg ) );
-		
-		chatMessagesContainer.appendChild( newChatMessage );
-		
-		chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
-	}
-	
-	var initChat = function( args )
-	{
-		var chatInput = null,
-			chatSendButton = null;
-		
-		var chatRefreshTimer = null;
-		
-		var MESSAGE_PER_SECOND_LIMIT = 4;
-		var messagesSent = 0;
-		
-		var lastMessageId = 0;
-		
-		var startHeartbeat = function()
-		{
-			var sendPulse = function()
-			{
-				kat.sendAJAX({
-								method: "POST",
-								address: "resources/php/still_alive.php",
-								data: {
-										gameId: _global_gameId
-									},
-								callback: function( xmlhttp )
-								{/*
-									if( xmlhttp.responseText != "1" )
-									{
-										alert( "heartbeat died" );
-										return;
-									}
-									*/
-									sendPulse();
-								}
-							});
-			}
-			
-			sendPulse();
-			setTimeout( sendPulse, 5000 );
-		}
-		
-		var sendData = function()
-		{
-			if( messagesSent > MESSAGE_PER_SECOND_LIMIT )
-			{
-				return;
-			}
-			
-			var message = chatInput.value.trim();
-			chatInput.value = "";
-			
-			if( message == "" )
-			{
-				return;
-			}
-			
-			messagesSent++;
-			
-			
-			
-			kat.sendAJAX({
-							method: "POST",
-							address: "resources/php/save_chat_message.php",
-							data:{
-									gameId: _global_gameId,
-									message: message
-								},
-							callback: function( xmlhttp )
-							{
-								var res = kat.commonJSONResponseProcessing( xmlhttp );
-								if( !res )
-								{
-									return;
-								}
-								
-								if( res.rc == "0" )
-								{
-									alert( res.em );
-									
-									//todo treat exceptions
-									
-									return;
-								}
-							}
-						});
-		}
-		
-		//start
-		chatMessagesContainer = kat.getElm( "chatMessagesContainer" );
-		chatInput = kat.getElm( "chatInput" );
-		chatSendButton = kat.getElm( "chatSendButton" );
-		
-		kat.setActiveOnEnter({
-								elm: chatInput,
-								fct: sendData
-							});
-							
-		kat.addEvent({ 
-						elm: chatSendButton,
-						event: "click",
-						fct: sendData
-					});
-		
-		kat.sendAJAX({
-						method: "POST",
-						address: "resources/php/get_last_message_id.php",
-						data: {
-								gameId: _global_gameId
-							},
-						callback: function( xmlhttp )
-						{
-							var res = kat.commonJSONResponseProcessing( xmlhttp );
-							if( !res )
-							{
-								return;
-							}
-							
-							if( res.rc == "0" )
-							{
-								alert( res.em );
-								
-								//todo treat exceptions
-								
-								return;
-							}
-							
-							if( res.rows[0].cl_id )
-							{
-								lastMessageId = res.rows[0].cl_id;
-							}
-							
-							chatRefreshTimer = setInterval( function()
-							{
-								messagesSent = 0;
-								
-								kat.sendAJAX({
-												method: "POST",
-												address: "resources/php/get_chat_messages.php",
-												data: {
-														gameId: _global_gameId,
-														lastMessageId: lastMessageId
-													},
-												callback: function( xmlhttp )
-												{
-													var res = kat.commonJSONResponseProcessing( xmlhttp );
-													if( !res )
-													{
-														return;
-													}
-													
-													if( res.rc == "0" )
-													{
-														alert( res.em );
-														
-														//todo treat exceptions
-														
-														return;
-													}
-													
-													if( !res.messages )
-													{
-														return;
-													}
-													
-													for( var i = 0; i < res.messages.length; i++ )
-													{
-														addMessageToChatWindow( res.messages[i].cl_message );
-													}
-													
-													lastMessageId = res.messages[res.messages.length - 1].cl_id;
-												}
-											});
-							}, 1000 );
-						}
-					});
-					
-		//startHeartbeat();
-	}
 
 
 //Events for canvas		
@@ -259,78 +42,78 @@
 		}
 	var terrain = [];
 
-var generateTerrain= function(dimX, dimY)
-{
-	
-	//Alocare
-	for (var i = 0; i < dimY; i++) 
+	var generateTerrain= function(dimX, dimY)
 	{
-		terrain[i] = [];
+		
+		//Alocare
+		for (var i = 0; i < dimY; i++) 
+		{
+			terrain[i] = [];
+		}
+		
+		
+		//Initializare
+		for(i = 0;i<dimY;i++)
+		{
+			for(j = 0;j<dimX; j++)
+			{
+				terrain[i][j] = 0;
+			}
+		}	
+		
+		//Stabilesc limita terenului
+		
+		var bias = 2;
+		
+		groundLimitY = Math.floor(3*dimY/7);
+		//console.log(groundLimitY);
+		
+		startBlockOld = groundLimitY + Math.floor(Math.random()*(dimY-groundLimitY-2));
+		//console.log(startBlockOld);
+		
+			startBlock = startBlockOld + Math.floor( Math.random()*bias*2)-bias;
+				
+			startBlockOld = startBlock;
+			
+			posY = startBlockOld;
+			//console.log(posY);
+			
+			if(startBlock > dimY-1)
+				startBlock = dimY-1;
+			if(startBlock < 0)
+				startBlock = 0;
+			
+			for(y = startBlock; y<dimY ; y++)
+			{
+				terrain[y][0] =  map.ROCK;
+			}
+			terrain[startBlock][0] =  map.BEDROCK;
+		
+		
+		for(x = 1; x < dimX; x++)
+		{
+			startBlock = startBlockOld + Math.floor( Math.random()*bias*2)-bias;
+				
+			startBlockOld = startBlock;
+			//console.log(posY);
+			
+			if(startBlock > dimY-1)
+				startBlock = dimY-1;
+			if(startBlock < 0)
+				startBlock = 0;
+				
+			addFlower = Math.floor( Math.random()*10);
+			if(addFlower % 2 == 0 && startBlock>1)
+				terrain[startBlock-1][x] =  map.FLOWER;
+			
+			for(y = startBlock; y<dimY ; y++)
+			{
+				terrain[y][x] =  map.ROCK;
+			}
+			terrain[startBlock][x] =  map.BEDROCK;
+			
+		}
 	}
-	
-	
-	//Initializare
-	for(i = 0;i<dimY;i++)
-	{
-		for(j = 0;j<dimX; j++)
-		{
-			terrain[i][j] = 0;
-		}
-	}	
-	
-	//Stabilesc limita terenului
-	
-	var bias = 2;
-	
-	groundLimitY = Math.floor(3*dimY/7);
-	//console.log(groundLimitY);
-	
-	startBlockOld = groundLimitY + Math.floor(Math.random()*(dimY-groundLimitY-2));
-	//console.log(startBlockOld);
-	
-		startBlock = startBlockOld + Math.floor( Math.random()*bias*2)-bias;
-			
-		startBlockOld = startBlock;
-		
-		posY = startBlockOld;
-		//console.log(posY);
-		
-		if(startBlock > dimY-1)
-			startBlock = dimY-1;
-		if(startBlock < 0)
-			startBlock = 0;
-		
-		for(y = startBlock; y<dimY ; y++)
-		{
-			terrain[y][0] =  map.ROCK;
-		}
-		terrain[startBlock][0] =  map.BEDROCK;
-	
-	
-	for(x = 1; x < dimX; x++)
-	{
-		startBlock = startBlockOld + Math.floor( Math.random()*bias*2)-bias;
-			
-		startBlockOld = startBlock;
-		//console.log(posY);
-		
-		if(startBlock > dimY-1)
-			startBlock = dimY-1;
-		if(startBlock < 0)
-			startBlock = 0;
-			
-		addFlower = Math.floor( Math.random()*10);
-		if(addFlower % 2 == 0 && startBlock>1)
-			terrain[startBlock-1][x] =  map.FLOWER;
-		
-		for(y = startBlock; y<dimY ; y++)
-		{
-			terrain[y][x] =  map.ROCK;
-		}
-		terrain[startBlock][x] =  map.BEDROCK;
-		
-	}
-}
 	
 	
 	var initGame = function( args )
@@ -386,15 +169,12 @@ var generateTerrain= function(dimX, dimY)
 		var astre = {"-1":sun, "1":moon};
 		
 		var nr_cubesY = Math.floor(canvasHeight/map.CUBE_SIZE);
-		console.log(nr_cubesY);
-		console.log(posY);
 		
 		var offset = nr_cubesY - posY;
 		if(offset < 0)
 			offset -= Math.min(Math.floor(nr_cubesY/2), map.DIM_Y-posY); 
 		else
 			offset = 0;
-		console.log(offset);
 		
 		function drawMap()
 		{
@@ -436,7 +216,6 @@ var generateTerrain= function(dimX, dimY)
 			{
 				return;
 			}
-			console.log("set");
 			if( timer != null )
 			{
 				clearInterval(timer);
@@ -470,7 +249,6 @@ var generateTerrain= function(dimX, dimY)
 		
 		clearTimerForMovement = function(e)
 		{
-			console.log("clear");
 			clearInterval(timer);
 			timer = null;
 			timerSet = false;
@@ -507,50 +285,47 @@ var generateTerrain= function(dimX, dimY)
 			}
 		}
 		
-	//Change background color
+		//Change background color
+			
+		var blue = 0;
+		var red = 0;
+		var pas = 1;
 		
-	var blue = 0;
-	var red = 0;
-	var pas = 1;
-	
-		
-	var changeBackgroundColor = function()
-	{
-		switch(blue)
+			
+		var changeBackgroundColor = function()
 		{
-			case 255:
-				pas = -1;				
-				break;
-			case 0:
-				pas = +1;
-				//pasAstru = pasAstru*-1;
-				break;
-			case 127:
-				posXAstru = -2;
-				posYAstru = canvasHeight/7;
-				crtAstru = crtAstru*-1;
-				break;
-			case 64:
-				//pasAstru = pasAstru*-1;
-				break;
-			case 191:
-				//pasAstru = pasAstru*-1;
-				break;
-				
-			default:
-				break;
-		}	
+			switch(blue)
+			{
+				case 255:
+					pas = -1;				
+					break;
+				case 0:
+					pas = +1;
+					//pasAstru = pasAstru*-1;
+					break;
+				case 127:
+					posXAstru = -2;
+					posYAstru = canvasHeight/7;
+					crtAstru = crtAstru*-1;
+					break;
+				case 64:
+					//pasAstru = pasAstru*-1;
+					break;
+				case 191:
+					//pasAstru = pasAstru*-1;
+					break;
+					
+				default:
+					break;
+			}	
 
-		posXAstru += canvasWidth/255;
-		posYAstru += -0.7;
-	
-		drawMap();
-				
-		blue = blue+pas;
-		mapContainer.style.backgroundColor ="rgb(" + red + " , "+red+" , "+blue+" )";
-	}
+			posXAstru += canvasWidth/255;
+			posYAstru += -0.7;
+		
+			drawMap();
+					
+			blue = blue+pas;
+			mapContainer.style.backgroundColor ="rgb(" + red + " , "+red+" , "+blue+" )";
+		}
 
-	
-		
-		
 	}
