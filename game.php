@@ -25,6 +25,8 @@
 		<script type="text/javascript" src="resources/js/kat.js"></script>
 		
 		<script type="text/javascript" src="resources/js/game.js"></script>
+		
+		<script type="text/javascript" src="resources/js/gameWS.js"></script>
 		<script type="text/javascript">
 			kat.addEvent({
 							elm: window,
@@ -38,6 +40,10 @@
 										});
 							*/
 								initGame();
+								
+								initWS({
+										username: <?php echo json_encode( $_SESSION["username"] ); ?>
+									});
 							}
 						});
 		</script>
@@ -49,7 +55,7 @@
 		<div id="main">
 			<div id="gameScreenContainer">
 				<div id="mapContainer" class="mapContainer">
-					<canvas id="gameCanvas" width="800" height="600"></canvas>
+					<canvas id="gameCanvas" width="1000" height="940" tabindex="1"></canvas>
 				</div>
 				
 			</div>
@@ -62,6 +68,9 @@
 				<input type="button" id="chatSendButton" value="Send"/>
 			</div>
 			
+		</div>
+		
+		<div id="player" style="position:absolute;height:80px;width:40px;background-color:pink;top:0px;left:0px;">
 		</div>
 		
 	</body>
