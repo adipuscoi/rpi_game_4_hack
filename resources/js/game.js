@@ -178,7 +178,7 @@
 		
 		function drawMap()
 		{
-			ctx.clearRect(0,0,1000,1000);
+			ctx.clearRect(0,0,1200,1000);
 			
 			ctx.drawImage(astre[crtAstru], posXAstru, posYAstru);
 			

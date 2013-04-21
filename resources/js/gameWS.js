@@ -25,6 +25,7 @@
 			
 			if( msg.cmd == "init" )
 			{
+				terrain = msg.terrain;
 				connection.send( JSON.stringify( { cmd: "loadUser", username: args.username } ) );
 				
 				return;
