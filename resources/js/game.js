@@ -223,21 +223,51 @@
 					
 		//startHeartbeat();
 	}
+
+
+//Events for canvas		
+	
+	var addCanvasEvents = function()
+	{
+		kat.addEvent({ 
+							elm: gameCanvas,
+							event: "keyup",
+							fct: clearTimerForMovement
+						});
+						
+			kat.addEvent({ 
+							elm: gameCanvas,
+							event: "keydown",
+							fct: setTimerForMovement
+						});		
+						
+			kat.addEvent({
+							elm: gameCanvas,
+							event: "mousemove",
+							fct:function(e){
+											coords = kat.getMouseInElementXY(e);
+											mouseCoord.innerHTML= coords.x +" "+coords.y;
+													}
+			
+			
+						});
+	}
+
+
 	
 	
 	var map = {
-    "AIR": 0,
-    "ROCK":1,
-    "BEDROCK":2,
-	"DIRT":3,
-    "SAND":4,
-    "NR_BLOCKS":5,
-	"DIM_X":40,
-	"DIM_Y":40,
-	"CUBE_SIZE":30,
-}
-
-
+		"AIR": 0,
+		"ROCK":1,
+		"BEDROCK":2,
+		"DIRT":3,
+		"SAND":4,
+		"FLOWER":5,
+		"NR_BLOCKS":5,
+		"DIM_X":40,
+		"DIM_Y":40,
+		"CUBE_SIZE":30,
+		}
 	var terrain = [];
 
 var generateTerrain= function(dimX, dimY)
@@ -257,11 +287,11 @@ var generateTerrain= function(dimX, dimY)
 		{
 			terrain[i][j] = 0;
 		}
-	}
+	}	
 	
 	//Stabilesc limita terenului
 	
-	var bias = 3;
+	var bias = 2;
 	
 	groundLimitY = Math.floor(3*dimY/7);
 	//console.log(groundLimitY);
@@ -299,6 +329,10 @@ var generateTerrain= function(dimX, dimY)
 			startBlock = dimY-1;
 		if(startBlock < 0)
 			startBlock = 0;
+			
+		addFlower = Math.floor( Math.random()*10);
+		if(addFlower % 2 == 0)
+			terrain[startBlock-1][x] =  map.FLOWER;
 		
 		for(y = startBlock; y<dimY ; y++)
 		{
@@ -309,63 +343,102 @@ var generateTerrain= function(dimX, dimY)
 	}
 }
 	
+	
 	var initGame = function( args )
 	{
 		ctx = document.getElementById('gameCanvas').getContext('2d');
-		/*
-		var map = [];
-		for( var i = 0; i < 300; i++ )
-		{
-			map[i] = [];
-			for( j = 0; j < 300; j++ )
-			{
-				map[i][j] = Math.floor( Math.random() * 4 ) + 1;
-			}
-		}
-		*/
+		gameCanvas = document.getElementById("gameCanvas");
+		
+		var canvasHeight = gameCanvas.getAttribute("height");
+		var canvasWidth = gameCanvas.getAttribute("width");
+		
 		var groundTiles = [];
-		groundTilesToLoad = 4;
+		imagesToLoad = 6;		
+		
 		generateTerrain( map.DIM_X, map.DIM_Y );
-		for( var i = 0; i < 5; i++ )
+		
+		var imageLoader = function( resourceName )
 		{
-			groundTiles[i] = new Image();
-			groundTiles[i].src = 'resources/img/' + i + '.png';
-			groundTiles[i].onload = function()
+		
+			var image = new Image();
+			image.src = resourceName;
+			image.onload = function()
 			{
-				groundTilesToLoad--;
-				if( groundTilesToLoad == 0 )
+				imagesToLoad--;
+				if( imagesToLoad == 0 )
 				{
 					drawMap();
+					addCanvasEvents();
+					setInterval(changeBackgroundColor,100);
 				}
 			};
-			
+		
+			return image;
 		}
-	
+		
+		for( var i = 0; i < 5; i++ )
+		{
+			groundTiles[i] = imageLoader('resources/img/' + i + '.png');				
+		}
+
+		var sun = imageLoader('resources/img/sun.png');
+		var moon = imageLoader('resources/img/moon.png');
+		var flower = imageLoader('resources/img/f.png');
+		
+		var character = [];
+		
+		for( var i = 0; i < 2; i++ )
+		{
+			character[i] = imageLoader('resources/img/c' + i + '.png');				
+		}
+		
+		var crtAstru = 1;
+		var crtCharacter = 0;
+		var astre = {"-1":sun, "1":moon};
+		
+		var nr_cubesY = Math.floor(canvasHeight/map.CUBE_SIZE);
+		console.log(nr_cubesY);
+		console.log(posY);
+		
+		var offset = nr_cubesY - posY;
+		if(offset < 0)
+			offset -= Math.min(Math.floor(nr_cubesY/2), map.DIM_Y-posY); 
+		else
+			offset = 0;
+		console.log(offset);
+		
 		function drawMap()
 		{
 			ctx.clearRect(0,0,1000,1000);
+			
+			ctx.drawImage(astre[crtAstru], posXAstru, posYAstru);
+			
 			for( var y = 0; y < terrain.length; y++ )
 			{
 				for( var x = 0; x < terrain[y].length; x++ )
 				{
-					//if( terrain[y][x] != 0 )
-					//{
-						ctx.drawImage(groundTiles[terrain[y][x]], dx+x*map.CUBE_SIZE, dy+y*map.CUBE_SIZE);						
-						
-					//}
+					if( terrain[y][x] != 0 )
+					{
+						if(terrain[y][x] == 5)
+						{
+							ctx.drawImage(flower, dx+x*map.CUBE_SIZE, dy+y*map.CUBE_SIZE+offset*map.CUBE_SIZE+16);						
+						}
+						else
+						{
+							ctx.drawImage(groundTiles[terrain[y][x]], dx+x*map.CUBE_SIZE, dy+y*map.CUBE_SIZE+offset*map.CUBE_SIZE);						
+						}
+					}
 				}
 			}
-			ctx.drawImage(groundTiles[4],dx, dy+(posY-1)*map.CUBE_SIZE);
-			ctx.drawImage(groundTiles[4],dx, dy+(posY-2)*map.CUBE_SIZE);			
-		}
+			ctx.drawImage(character[crtCharacter],dx, dy+offset*map.CUBE_SIZE+(posY-2)*map.CUBE_SIZE);							
+		}		
 		
-		//Events for canvas		
-		gameCanvas = document.getElementById("gameCanvas");
 		mouseCoord = document.getElementById("mouseCoord");
 		mapContainer = document.getElementById("mapContainer");
 		
-		var canvasHeight = gameCanvas.getAttribute("height");
-		var canvasWidth = gameCanvas.getAttribute("width");
+		
+		posYAstru = canvasHeight/7;
+		posXAstru = canvasWidth/2;
 		
 		var timer;
 		var timerSet = false;
@@ -389,9 +462,11 @@ var generateTerrain= function(dimX, dimY)
 					break;
 				case 65://a
 					opt = 2;
+					crtCharacter = 0;
 					break;
 				case 68://d
 					opt = 3;
+					crtCharacter = 1;
 					break;
 				case 83://s
 					opt = 4;
@@ -431,8 +506,9 @@ var generateTerrain= function(dimX, dimY)
 					drawMap();
 					break;
 				case 3://d
-					if(map.DIM_X*map.CUBE_SIZE - canvasWidth > -1*dx)
-					dx--;
+					if(	( (map.DIM_X*map.CUBE_SIZE - canvasWidth) > -1*dx )
+					&& ( (posX - canvasWidth) > -1*dx ) )
+						dx--;
 					drawMap();
 					break;
 				case 4://s
@@ -443,59 +519,50 @@ var generateTerrain= function(dimX, dimY)
 			}
 		}
 		
-		
-		kat.addEvent({ 
-						elm: gameCanvas,
-						event: "keyup",
-						fct: clearTimerForMovement
-					});
-					
-		kat.addEvent({ 
-						elm: gameCanvas,
-						event: "keydown",
-						fct: setTimerForMovement
-					});		
-					
-		kat.addEvent({
-						elm: gameCanvas,
-						event: "mousemove",
-						fct:function(e){
-										coords = kat.getMouseInElementXY(e);
-										mouseCoord.innerHTML= coords.x +" "+coords.y;
-												}
-		
-		
-		});
-		
 	//Change background color
 		
 	var blue = 0;
 	var red = 0;
 	var pas = 1;
+	
 		
 	var changeBackgroundColor = function()
 	{
 		switch(blue)
 		{
 			case 255:
-				pas = -1;
+				pas = -1;				
 				break;
-			case 20:
+			case 0:
 				pas = +1;
+				//pasAstru = pasAstru*-1;
 				break;
+			case 127:
+				posXAstru = -2;
+				posYAstru = canvasHeight/7;
+				crtAstru = crtAstru*-1;
+				break;
+			case 64:
+				//pasAstru = pasAstru*-1;
+				break;
+			case 191:
+				//pasAstru = pasAstru*-1;
+				break;
+				
 			default:
-				//console.log("Change background color");
 				break;
 		}	
 
-		posXAstru += 255/canvasWidth;
+		posXAstru += canvasWidth/255;
+		posYAstru += -0.7;
+	
+		drawMap();
 				
 		blue = blue+pas;
-				//console.log(blue);
-		
 		mapContainer.style.backgroundColor ="rgb(" + red + " , "+red+" , "+blue+" )";
 	}
 
-	setInterval(changeBackgroundColor,10);
+	
+		
 		
 	}
