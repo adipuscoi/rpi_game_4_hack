@@ -32,14 +32,18 @@
 	</head>
 	
 	<body>
+		<div id="title">
+			<img src="resources/img/title.png"></img>
+		</div>
 	
 		<div id="main">
 			
 			<input type="text" id="usernameInput"/>
 			<input type="password" id="passwordInput"/>
-			<input type="button" id="loginButton" value="Log in"/>
-			<input type="button" id="createAccountButton" value="Create account"/>
-			
+			<div id="buttons">
+				<input type="button" id="loginButton" value="Log in"/>
+				<input type="button" id="createAccountButton" value="Create account"/>
+			</div>
 		</div>
 		
 	</body>

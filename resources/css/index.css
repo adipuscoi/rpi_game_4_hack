@@ -1,2 +1,59 @@
+#usernameInput
+{
+	display: block;
+	height: 30px;
+	width: 200px;
+	left: 1%;
+	position: relative;
+	margin: 4px;
+}
 
+#passwordInput
+{
+	display: block;
+	height: 30px;
+	width: 200px;
+	left: 1%;
+	position: relative;
+	margin: 4px;
+}
+
+#loginButton
+{
+	
+}
+#title
+{
+	position: absolute;
+	width: 300px;
+	height: 300px;
+	left: 42%;
+	top: 15%;
+}
+
+#createAccountButton
+{
+
+}
+#buttons
+{
+	margin: 4px;
+	margin-left: 20px;
+}
+
+#main
+{
+	position: absolute;
+	width: 300px;
+	height: 300px;
+	left: 45%;
+	top: 30%;
+}
+
+body
+{
+	background-color:#000000;
+
+
+}
 	
