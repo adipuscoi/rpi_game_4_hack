@@ -331,7 +331,7 @@ var generateTerrain= function(dimX, dimY)
 			startBlock = 0;
 			
 		addFlower = Math.floor( Math.random()*10);
-		if(addFlower % 2 == 0)
+		if(addFlower % 2 == 0 && startBlock>1)
 			terrain[startBlock-1][x] =  map.FLOWER;
 		
 		for(y = startBlock; y<dimY ; y++)
